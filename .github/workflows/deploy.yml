@@ -41,8 +41,9 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config --global user.name "${{ secrets.USER_NAME }}"
-          git config --global user.email "${{ secrets.USER_EMAIL }}"
-          git add click-store/values.yaml
-          git commit -m "Update version to ${{ github.run_number }}"
+          git config --global user.name "ci-cd"
+          git config --global user.email "actions@github.com"
+          cd ai-server-k8s
+          git add projects/click-store/values.yaml
+          git commit -m "Update image tag to ${{ github.run_number }}"
           git push
