@@ -23,17 +23,21 @@ jobs:
           push: true
           tags: kaburi/click-store-server:latest, kaburi/click-store-server:${{ github.run_number }}
 
-      - name: Checkout click-helms repository
+      - name: Checkout ai-server-k8s-update repository
         uses: actions/checkout@v3
         with:
-          repository: KaburiCoder/click-helms
-          token: ${{ secrets.CLICK_HELMS_REPO_TOKEN }} # GitHub 토큰
-          path: .
-          ref: main # 기본 브랜치를 명시적으로 지정 (main이 기본 브랜치일 경우)
+          repository: clicksoft-ko/ai-server-k8s
+          token: ${{ secrets.K8S_UPDATE_TOKEN }}
+          path: ai-server-k8s
+          ref: main
 
-      - name: Update YAML file
+      - name: Install yq (fast)
         run: |
-          sed -i '/server:/,/service:/s/version: ".*"/version: "${{ github.run_number }}"/' click-store/values.yaml
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+      - name: Update image tag in values.yaml (yq)
+        run: |
+          yq -i '.server.image.version = "${{ github.run_number }}"' ai-server-k8s/projects/click-store/values.yaml
 
       - name: Commit and push changes
         run: |
